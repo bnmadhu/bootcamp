@@ -108,3 +108,17 @@ services:
       - jenkins-docker-certs:/certs/client
       - jenkins-data:/var/jenkins_home
 
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    ports:
+      - 8888:80
+      - 8822:22
+    networks:
+      custom:
+        ipv4_address: 192.168.61.17
+        aliases:
+          - gitlab
+    privileged: true
+    domainname: codespaces.io
+    hostname: gitlab
+    restart: always
