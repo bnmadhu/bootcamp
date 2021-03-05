@@ -12,6 +12,9 @@ volumes:
   cs-ansible:
   jenkins-docker-certs:
   jenkins-data:
+  gitlab-config:
+  gitlab-data:
+  gitlab-logs:
 
 services:
   control:
@@ -30,7 +33,7 @@ services:
   frontend:
     image: codespaces/ansible-node-ubuntu:18.04
     ports:
-       - "80:8079"
+       - "8079:8079"
     networks:
       custom:
         ipv4_address: 192.168.61.11
@@ -46,7 +49,7 @@ services:
       custom:
         ipv4_address: 192.168.61.12
     dns: 8.8.8.8
-    domainname: mdynamics.local
+    domainname: mdynamics.in
     hostname: catalogue
     restart: always
   carts:
@@ -57,7 +60,7 @@ services:
       custom:
         ipv4_address: 192.168.61.13
     dns: 8.8.8.8
-    domainname: mdynamics.local
+    domainname: mdynamics.in
     hostname: carts
     restart: always
   carts-db:
@@ -80,7 +83,7 @@ services:
       custom:
         ipv4_address: 192.168.61.15
     dns: 8.8.8.8
-    domainname: mdynamics.local
+    domainname: mdynamics.in
     hostname: jenkins
     restart: always
     volumes:
@@ -101,7 +104,7 @@ services:
         aliases:
           - docker
     privileged: true
-    domainname: mdynamics.local
+    domainname: mdynamics.in
     hostname: docker
     restart: always
     volumes:
@@ -111,14 +114,21 @@ services:
   gitlab:
     image: gitlab/gitlab-ce:latest
     ports:
-      - 8888:80
-      - 8822:22
+      - "8888:80"
+      - "22:22"
+      - "443:443"
+    environment:
+      - GITLAB_OMNIBUS_CONFIG="external_url 'https://gitlab.mdynamics.in/';"
     networks:
       custom:
         ipv4_address: 192.168.61.17
         aliases:
           - gitlab
     privileged: true
-    domainname: mdynamics.local
+    domainname: mdynamics.in
     hostname: gitlab
     restart: always
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
